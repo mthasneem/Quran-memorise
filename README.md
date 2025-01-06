@@ -37,7 +37,7 @@ The Quran Memorization App is a distraction-free application designed to help us
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/quran-memorization-app.git
+   git clone https://github.com/mthasneem/Quran-memorise
    ```
 
 2. **Install Dependencies**
@@ -70,7 +70,7 @@ Contributions are welcome! If you'd like to contribute to the project, please fo
 
 ## Contact
 
-For any inquiries or feedback, please contact [your_email@example.com].
+For any inquiries or feedback, please contact [mthasneem703@gmail.com].
 
 ---
 
