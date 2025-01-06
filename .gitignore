@@ -4,3 +4,4 @@ qmem/
 env/
 ENV/
 __pycache__/
+output/
