@@ -34,6 +34,9 @@ class QuranMemorizationApp(ctk.CTk):
                 print("Sura not found")
                 return
 
+            # Reset current_ayah to 0 when a new surah is selected
+            self.current_ayah = 0
+
             if self.sura_window is None or not self.sura_window.winfo_exists():
                 self.sura_window = ctk.CTkToplevel(self)
                 self.sura_window.title(f"Sura {self.selected_sura['englishName']} ({self.selected_sura['name']})")
@@ -43,14 +46,20 @@ class QuranMemorizationApp(ctk.CTk):
                 self.sura_window.attributes('-topmost', 1)
                 self.sura_window.after(100, lambda: self.sura_window.attributes('-topmost', 0))
 
-                self.ayah_frame = ctk.CTkFrame(self.sura_window)
-                self.ayah_frame.pack(fill="both", expand=True)
+                # Main frame to hold ayah frame and navigation frame
+                self.main_frame = ctk.CTkFrame(self.sura_window)
+                self.main_frame.pack(fill="both", expand=True)
 
-                self.ayah_label = ctk.CTkLabel(self.ayah_frame, text="", wraplength=600, font=("Arial", 30))
-                self.ayah_label.pack(pady=20)
+                # Ayah frame with scrolling
+                self.ayah_frame = ctk.CTkScrollableFrame(self.main_frame, height=300)  # Set a fixed height
+                self.ayah_frame.pack(fill="both", expand=True, pady=10, padx=10)
 
-                self.navigation_frame = ctk.CTkFrame(self.sura_window)
-                self.navigation_frame.pack(side="bottom", fill="x")
+                self.ayah_label = ctk.CTkLabel(self.ayah_frame, text="", wraplength=550, font=("Arial", 30))
+                self.ayah_label.pack(pady=10, padx=10)
+
+                # Navigation frame at the bottom
+                self.navigation_frame = ctk.CTkFrame(self.main_frame)
+                self.navigation_frame.pack(side="bottom", fill="x", pady=10)
 
                 self.prev_button = ctk.CTkButton(self.navigation_frame, text="Previous Ayah", command=self.show_prev_ayah, state="disabled")
                 self.prev_button.pack(side="left", padx=10, pady=10)
@@ -59,6 +68,7 @@ class QuranMemorizationApp(ctk.CTk):
                 self.next_button.pack(side="right", padx=10, pady=10)
             else:
                 self.sura_window.title(f"Sura {self.selected_sura['englishName']} ({self.selected_sura['name']})")
+                # Reset current_ayah to 0 when reopening the same surah
                 self.current_ayah = 0
                 self.show_next_ayah()
         except Exception as e:
@@ -68,19 +78,34 @@ class QuranMemorizationApp(ctk.CTk):
         self.current_ayah += 1
         ayah_text = fetch_ayah(self.selected_sura['number'], self.current_ayah)
         if ayah_text:
-            self.ayah_label.configure(text=ayah_text)
+            current_text = self.ayah_label.cget("text")
+            if current_text:
+                new_text = f"{current_text}\n\n{ayah_text}"
+            else:
+                new_text = ayah_text
+            self.ayah_label.configure(text=new_text)
             self.prev_button.configure(state="normal")
             if self.current_ayah >= self.selected_sura['numberOfAyahs']:
                 self.next_button.configure(state="disabled")
+            
+            # Automatically scroll to the newly added ayah
+            self.ayah_frame.update_idletasks()  # Ensure the frame is updated
+            self.ayah_frame._parent_canvas.yview_moveto(1.0)  # Scroll to the bottom
         else:
             self.current_ayah -= 1  # Reset to previous ayah
 
     def show_prev_ayah(self):
         if self.current_ayah > 1:
             self.current_ayah -= 1
-            ayah_text = fetch_ayah(self.selected_sura['number'], self.current_ayah)
-            if ayah_text:
-                self.ayah_label.configure(text=ayah_text)
+            current_text = self.ayah_label.cget("text")
+            if current_text:
+                # Split the text into individual ayahs
+                ayahs = current_text.split("\n\n")
+                # Remove the last ayah (current ayah)
+                ayahs.pop()
+                # Join the remaining ayahs back into a single string
+                new_text = "\n\n".join(ayahs)
+                self.ayah_label.configure(text=new_text)
                 self.next_button.configure(state="normal")
             if self.current_ayah == 1:
                 self.prev_button.configure(state="disabled")
