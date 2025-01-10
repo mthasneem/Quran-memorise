@@ -34,6 +34,9 @@ class QuranMemorizationApp(ctk.CTk):
                 print("Sura not found")
                 return
 
+            # Reset current_ayah to 0 when a new surah is selected
+            self.current_ayah = 0
+
             if self.sura_window is None or not self.sura_window.winfo_exists():
                 self.sura_window = ctk.CTkToplevel(self)
                 self.sura_window.title(f"Sura {self.selected_sura['englishName']} ({self.selected_sura['name']})")
@@ -65,6 +68,7 @@ class QuranMemorizationApp(ctk.CTk):
                 self.next_button.pack(side="right", padx=10, pady=10)
             else:
                 self.sura_window.title(f"Sura {self.selected_sura['englishName']} ({self.selected_sura['name']})")
+                # Reset current_ayah to 0 when reopening the same surah
                 self.current_ayah = 0
                 self.show_next_ayah()
         except Exception as e:
@@ -83,6 +87,10 @@ class QuranMemorizationApp(ctk.CTk):
             self.prev_button.configure(state="normal")
             if self.current_ayah >= self.selected_sura['numberOfAyahs']:
                 self.next_button.configure(state="disabled")
+            
+            # Automatically scroll to the newly added ayah
+            self.ayah_frame.update_idletasks()  # Ensure the frame is updated
+            self.ayah_frame._parent_canvas.yview_moveto(1.0)  # Scroll to the bottom
         else:
             self.current_ayah -= 1  # Reset to previous ayah
 
