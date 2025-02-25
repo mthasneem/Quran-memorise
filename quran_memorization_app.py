@@ -88,6 +88,9 @@ class QuranMemorizationApp(ctk.CTk):
 
                 self.next_button = ctk.CTkButton(self.navigation_frame, text="Next Ayah", command=self.show_next_ayah)
                 self.next_button.pack(side="right", padx=10, pady=10)
+
+                # Load the first ayah when the surah window is opened
+                self.show_next_ayah()
             else:
                 self.sura_window.title(f"Sura {self.selected_sura['englishName']} ({self.selected_sura['name']})")
                 # Reset current_ayah to 0 when reopening the same surah
